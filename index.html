@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html ng-app="plunker">
+
+  <head>
+    <meta charset="utf-8" />
+    <title>AngularJS Plunker</title>
+    <script>document.write('<base href="' + document.location + '" />');</script>
+    <link rel="stylesheet" href="style.css" />
+    <script data-require="angular.js@1.5.x" src="https://code.angularjs.org/1.5.8/angular.js" data-semver="1.5.8"></script>
+    <script src="app.js"></script>
+  </head>
+
+  <body ng-controller="MainCtrl">
+    <p>
+      Method of checking the long running task status by a recursive queue.<br><br>
+      Long running task can either finish in SUCCESS or FAILURE (manual input needed).<br>
+      Long running task completes in 3 seconds, either in SUCCESS or FAILURE.<br>
+      Upon finishing, Long running task signals the recursive queue to stop checking (longTaskFinishedFlag)<br><br>
+      Task completing can be interrupted. (Manual INTERRUPT)<br>
+    </p>
+    <button ng-click="init()"> Start Long Running Task </button>
+    <button ng-click="setFailedTask()"> Set Long Task as FAILED </button>
+    <button ng-click="generateInterrupt()"> Manual INTERRUPT </button>
+    <p>
+     <textarea ng-model="msg" rows="15" cols="70"></textarea>
+    </p>
+  </body>
+
+</html>
