@@ -6,7 +6,7 @@ app.controller('MainCtrl', function($scope, $q, $timeout) {
   $scope.isResolved = false;
   $scope.msg = "";
   var currentMsg = "";
-  var breaker = 0;
+  var checkCounter = 0;
   console.clear();
   
   function _ordinary_long_computing_task(isResolved) {
@@ -17,7 +17,10 @@ app.controller('MainCtrl', function($scope, $q, $timeout) {
     $scope.msg = currentMsg;
     deferred.notify(currentMsg);
     
-    // do stuff (Action that needs time to complete)
+    // TODO: do stuff (Action that needs time to complete)
+	// start of Long Running Task
+	// Replace this $timeout with your ACTUAL long running task
+	// Implement promise's resolve, reject and notify
     longTaskTimeout = $timeout(function() {
       currentMsg = 'Finishing long computing task.' + "\n";
       deferred.notify(currentMsg);
@@ -35,17 +38,21 @@ app.controller('MainCtrl', function($scope, $q, $timeout) {
       // Confirm computation has finished > set flag to true
       $scope.longTaskFinishedFlag = true;
     }, 3000);
+	// end of Long Running Task
+	
     return deferred.promise;
   }
   
   // Queue that recursively checkes for task completion
+  // When longTaskFinishedFlag is set, it will end execution or 
+  // finish by itself in a predifined time (30*500 = 15 sec)
   function _recursive_queue() {
     currentMsg = "Recursive queue check for task completion. Mark: " + (performance.now() - sTime).toFixed(4).toString() + "\n";
     $scope.msg += currentMsg;
     console.log(currentMsg);
-    if ( breaker < 30) {
+    if ( checkCounter < 30) {
       recursiveTimer = $timeout(function() {
-        breaker++;
+        checkCounter++;
         if (!$scope.longTaskFinishedFlag)
           _recursive_queue();
       }, 500);
@@ -57,12 +64,13 @@ app.controller('MainCtrl', function($scope, $q, $timeout) {
     }
   }
   
+  // start long running task and reinitialize variables;
   $scope.init = function() {
     $scope.longTaskFinishedFlag = false;
     $scope.isResolved = false;
     $scope.msg = "";
     currentMsg = "";
-    breaker = 0;
+    checkCounter = 0;
     console.clear();
     sTime = performance.now();
     
@@ -82,18 +90,19 @@ app.controller('MainCtrl', function($scope, $q, $timeout) {
     _recursive_queue();
   };
   
+  // mark Long running task as failed.
+  // In this way we manually simulate an error in the execution.
   $scope.setFailedTask = function() {
     $scope.isResolved = false;
   }
   
+  // General interrupt method that breaks and clears timers.
   $scope.generateInterrupt = function() {
     $scope.longTaskFinishedFlag = true;
-    if (longTaskTimeout) {
-      $timeout.cancel(longTaskTimeout);
-      currentMsg = "\n" + "ERROR! Manual interrupt! Exiting..." + "\n";
-      $scope.msg += currentMsg;
-      deferred.reject(currentMsg);
-    }
+	$timeout.cancel(longTaskTimeout);
+	currentMsg = "\n" + "ERROR! Manual interrupt! Exiting..." + "\n";
+	$scope.msg += currentMsg;
+	deferred.reject(currentMsg);
   }
   
   // $scope.init();
